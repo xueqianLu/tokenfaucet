@@ -37,6 +37,7 @@ func NewPool(conn, dbNum, password string) {
 				return nil, err
 			}
 			c.Do("SELECT", dbNum)
+			logs.Info("redis connect successful")
 			return c, nil
 		},
 	}
