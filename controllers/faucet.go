@@ -13,9 +13,10 @@ import (
 	"github.com/hpb-project/tokenfaucet/contracts"
 	"github.com/hpb-project/tokenfaucet/models"
 	"github.com/hpb-project/tokenfaucet/types"
-	"sync"
 	"strconv"
+	"sync"
 )
+
 var (
 	txMux = sync.Mutex{}
 )
@@ -82,7 +83,7 @@ func (f *FaucetController) TokenTransfer() {
 
 	if boo := rds_conn.SR.IsKeyExists(checkkey); boo {
 		beego.Error("check time limit ", "resut ", boo)
-		f.ResponseInfo(500, "", "Exceeding the daily limit.")
+		f.ResponseInfo(500, "Exceeding the daily limit.", "")
 		return
 	}
 	url := network.Url
@@ -106,7 +107,7 @@ func (f *FaucetController) TokenTransfer() {
 		tx, err := contracts.TokenTransfer(ctx, url, tokenAddr, myKey, toAddr, amount, ethrpc.GetNonce(network))
 		if err != nil {
 			beego.Error("token transfer failed ", " err ", err)
-			f.ResponseInfo(500, fmt.Sprintf("token transfer failed"), fmt.Sprintf("%s", err))
+			f.ResponseInfo(500, fmt.Sprintf("token transfer failed: %s", err), "")
 			return
 		}
 		txHash = tx.Hash().String()
@@ -115,7 +116,7 @@ func (f *FaucetController) TokenTransfer() {
 		tx, err := ethrpc.EthTransfer(network, myKey, toAddr, network.Coin)
 		if err != nil {
 			beego.Error("send coin transfer failed ", " err ", err)
-			f.ResponseInfo(500, fmt.Sprintf("coin transfer failed"), fmt.Sprintf("%s", err))
+			f.ResponseInfo(500, fmt.Sprintf("coin transfer failed: %s", err), "")
 			return
 		}
 		txHash = tx.Hash().String()
@@ -131,6 +132,6 @@ func (f *FaucetController) TokenTransfer() {
 		return
 	}
 
-	f.ResponseInfo(500, "transfer failure", "false")
+	f.ResponseInfo(500, "transfer failure", "")
 	return
 }
